@@ -1,0 +1,75 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'me.tatarka:gradle-retrolambda:3.2.2'
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+  compileSdkVersion 23
+  buildToolsVersion "23.0.2"
+
+  defaultConfig {
+    applicationId "com.openaccessmaps"
+    minSdkVersion 18
+    targetSdkVersion 23
+
+    def longVersionName = "git -C ${rootDir} describe --tags --long".execute().text.trim()
+    def (fullVersionTag, versionCommit, gitSha) = longVersionName.tokenize('-')
+    def (versionMajor, versionMinor, versionPatch) = fullVersionTag.tokenize('.')
+
+    versionCode versionMajor.toInteger() * 100000 +
+        versionMinor.toInteger() *
+        10000 +
+        versionPatch.toInteger() *
+        1000 +
+        versionCommit.toInteger()
+    versionName "${versionMajor}.${versionMinor}.${versionPatch}(${versionCommit})"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled true
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+
+    staging {
+      debuggable false
+    }
+
+    debug {
+      debuggable true
+    }
+  }
+
+  productFlavors {
+    normal
+    dev {
+      minSdkVersion 21
+    }
+  }
+}
+
+dependencies {
+  testCompile 'junit:junit:4.12'
+
+  compile 'com.android.support:appcompat-v7:23.1.1'
+  compile 'com.google.android.gms:play-services:8.4.0'
+  compile 'com.google.dagger:dagger:2.0.2'
+  compile 'com.google.dagger:dagger-compiler:2.0.2'
+  compile 'com.squareup.retrofit:retrofit:1.9.0'
+  compile 'com.squareup.okhttp:okhttp:2.7.4'
+  compile 'com.jakewharton:butterknife:7.0.1'
+  compile 'com.jakewharton.timber:timber:4.1.1'
+  compile 'com.github.frankiesardo:icepick:2.3.6'
+}
